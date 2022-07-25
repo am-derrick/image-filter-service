@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -30,9 +30,29 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   //! END @TODO1
   
+  app.get('/filterdimage', async (req: Request, res: Response) => {
+    // require query
+    let { image_url } = req.query;
+
+    // checks if img_url is valid using regexes and responds with error if not
+    if (!image_url) {
+      return res.status(400).send(`valid image URL is required`);
+    }
+
+    // filters image, responds with filtered image and deletes files on server
+    filterImageFromURL(image_url)
+      .then(localPath => {
+        res.sendFile(localPath, err => {
+          deleteLocalFiles([localPath]);
+        })
+      })
+      .catch(err => {
+        res.status(400).send(`valid image URL is required`);
+      });
+  });
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
