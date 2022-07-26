@@ -32,4 +32,4 @@ Follow the process described in the course to `eb init` a new application and `e
 
 ## URL Endpoint
 
-URL Endpoint for a running elastic beanstalk deployment: image-filter-service-dev.us-east-1.elasticbeanstalk.com
+URL Endpoint for a running elastic beanstalk deployment: http://image-filter-service-dev.us-east-1.elasticbeanstalk.com
