@@ -20,7 +20,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //    1. validate the image_url query
   //    2. call filterImageFromURL(image_url) to filter the image
   //    3. send the resulting file in the response
-  //    4. deletesgit any files on the server on finish of the response
+  //    4. delete any files on the server on finish of the response
   // QUERY PARAMATERS
   //    image_url: URL of a publicly accessible image
   // RETURNS
@@ -29,27 +29,27 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
-  
-  app.get('/filterdimage', async (req: Request, res: Response) => {
-    // require query
-    let { image_url } = req.query;
-
-    // checks if img_url is valid using regexes and responds with error if not
-    if (!image_url) {
-      return res.status(400).send(`valid image URL is required`);
+  app.get("/filteredimage", async (req: Request, res: Response) => {
+    // query image and convert to string
+    const image_url = req.query.image_url.toString();
+    
+    // checks if image query, otherwise sends error
+    if(!image_url) {
+      return res.status(400).send(`provide a valid image url`);
     }
 
-    // filters image, responds with filtered image and deletes files on server
-    filterImageFromURL(image_url)
-      .then(localPath => {
-        res.sendFile(localPath, err => {
-          deleteLocalFiles([localPath]);
-        })
-      })
-      .catch(err => {
-        res.status(400).send(`valid image URL is required`);
+    // on success, sends file and deletes file
+    try {
+      let path = await filterImageFromURL(image_url);
+
+      res.status(200).sendFile(path, () => {
+        deleteLocalFiles([path]);
       });
+    } catch (error) {
+      res.status(422).send(`error`);
+    }
   });
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get( "/", async ( req: Request, res: Response ) => {
